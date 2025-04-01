@@ -1,46 +1,56 @@
-'use client'
+"use client";
 
-import React, { useRef, useEffect, useState } from 'react'
-import { ClaudeChat } from './my-components/chatui'
-import CodeBlock from './my-components/code-block'
-import { useChat } from '@ai-sdk/react'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import React, { useRef, useEffect, useState } from "react";
+// import { ClaudeChat } from "./my-components/chatui";
+import CodeBlock from "./my-components/code-block";
+import { useChat } from "@ai-sdk/react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { TestUi } from "./my-components/testui";
 
 export default function Home() {
-  const { messages, handleInputChange, handleSubmit, status, input } = useChat({})
+  const { messages, handleInputChange, handleSubmit, status, input } = useChat(
+    {}
+  );
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const [code, setCode] = useState<string>('<h1>Hi</h1>')
+  const [code, setCode] = useState<string>("");
 
-  // Auto scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  function extractReturnJSX(componentCode: string) {
+    // Regex to match the content inside return (...)
+    const returnRegex = /return\s*\(\s*([\s\S]*?)\s*\)\s*;/;
 
-  const stripCode = (componentCode: string) => {
-    const regex = /return\s*\(\s*([\s\S]*?)\s*\);/
-    const match = componentCode.match(regex)
+    // Execute the regex
+    const match = componentCode.match(returnRegex);
 
     if (match && match[1]) {
-      return match[1].trim()
+      // Trim whitespace and return the JSX
+      return match[1].trim();
     }
+
+    return null;
   }
+
   useEffect(() => {
-    if (status !== 'ready') return
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-    if (messages.length < 2) return
-    console.log(messages[messages.length - 1].content)
+  useEffect(() => {
+    if (status !== "ready") return;
 
-    const stripped = stripCode(messages[messages.length - 1].content)
+    if (messages.length < 2) return;
 
-    if (stripped !== undefined) {
-      setCode(stripped)
+    const extracted = extractReturnJSX(messages[messages.length - 1].content);
+
+    if (extracted !== null) {
+      setCode(extracted);
+      // setCode(extracted);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status])
+  }, [status]);
 
+  console.log(code);
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       {/* Chat Panel */}
@@ -53,10 +63,10 @@ export default function Home() {
             <div
               key={message.id}
               className={`mb-3 p-3 rounded-lg max-w-4/5 ${
-                message.role === 'user' ? 'bg-green-100' : 'bg-gray-200 ml-auto'
+                message.role === "user" ? "bg-green-100" : "bg-gray-200 ml-auto"
               }`}
             >
-              {message.role !== 'user' ? (
+              {message.role !== "user" ? (
                 <CodeBlock code={message.content} />
               ) : (
                 `${message.content}`
@@ -86,10 +96,10 @@ export default function Home() {
 
         <div className="h-full flex justify-center items-center">
           <ScrollArea className="h-full w-full">
-            <ClaudeChat code={code} />
+            <TestUi genCode={code} />
           </ScrollArea>
         </div>
       </div>
     </div>
-  )
+  );
 }
