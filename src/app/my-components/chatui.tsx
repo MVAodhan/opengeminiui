@@ -1,17 +1,24 @@
-'use client'
+"use client";
 
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { LiveProvider, LiveError, LivePreview } from 'react-live'
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { LiveProvider, LiveError, LivePreview } from "react-live";
 
-export const ClaudeChat = ({ code, noInline = false }: { code: string; noInline?: boolean }) => {
+export const ClaudeChat = ({ genCode }: { genCode: string }) => {
+  const code = `
+  render(
+  <main className='w-full h-full flex justify-center pt-20'>
+    ${genCode}
+  </main>
+  )
+`;
   return (
     <div className="flex flex-col h-full w-full">
       <ScrollArea>
-        <LiveProvider code={code} noInline={noInline}>
+        <LiveProvider code={code} noInline>
           <LiveError />
           <LivePreview />
         </LiveProvider>
       </ScrollArea>
     </div>
-  )
-}
+  );
+};
