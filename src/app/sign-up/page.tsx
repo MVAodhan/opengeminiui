@@ -1,7 +1,22 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 
 export default function SignUpScreen() {
+  const signupWithGithun = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+    });
+
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(data);
+    }
+  };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 bg-white p-8 sm:p-10 rounded-xl shadow-lg">
@@ -38,7 +53,7 @@ export default function SignUpScreen() {
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" action="#" method="POST">
+        <div className="mt-8 space-y-6">
           <input type="hidden" name="remember" defaultValue="true" />
           {/* Removed shadow-sm and rounded-md from this container */}
           <div className="space-y-4">
@@ -129,8 +144,8 @@ export default function SignUpScreen() {
 
           <div className="flex w-full ">
             <div className="w-full">
-              <a
-                href="#"
+              <Button
+                onClick={signupWithGithun}
                 className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition duration-150 ease-in-out"
               >
                 {/* Placeholder for GitHub Icon */}
@@ -145,10 +160,10 @@ export default function SignUpScreen() {
                   </svg>
                 </div>
                 <span className="sr-only sm:not-sr-only">GitHub</span>
-              </a>
+              </Button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
