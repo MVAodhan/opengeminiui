@@ -12,15 +12,26 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Profile, SupbaseUserResponse, UserInfo } from "@/lib/types";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 export default function Home() {
-  const { messages, handleInputChange, handleSubmit, status, input } = useChat(
-    {}
-  );
-
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
+  const [customErr, setCustomErr] = useState<string | null>(null);
   const [code, setCode] = useState<string>("");
   const [profile, setProfile] = useState<Profile | null>(null);
+
+  const { messages, handleInputChange, handleSubmit, status, input, error } =
+    useChat({
+      onError: (error) => {
+        {
+          const errData = JSON.parse(error.message);
+          setCustomErr(errData.error.message);
+        }
+      },
+    });
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   function extractReturnJSX(componentCode: string) {
     // Regex to match the content inside return (...)
@@ -81,7 +92,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
-  console.log("profile", profile);
   return (
     <div className="h-screen w-screen overflow-hidden">
       {/* Chat Panel */}
@@ -109,6 +119,17 @@ export default function Home() {
                 </div>
               ))}
               <div ref={messagesEndRef} />
+              {customErr && (
+                <Alert variant="destructive" className="mb-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription className="flex w-full justify-between items-center">
+                    {customErr}
+
+                    <Button variant="ghost">Reload</Button>
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             <div className="flex mt-auto">
@@ -116,9 +137,12 @@ export default function Home() {
                 <input
                   type="text"
                   value={input}
-                  className="flex w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`flex ${
+                    error ? "boreder border-red-500" : ""
+                  } w-full p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   placeholder="Type your message..."
                   onChange={handleInputChange}
+                  disabled={error != null}
                 />
               </form>
             </div>
