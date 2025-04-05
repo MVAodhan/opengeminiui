@@ -59,3 +59,20 @@ interface IdentityData {
   sub: string;
   user_name: string;
 }
+
+export interface SupbaseUserResponse {
+  data: {
+    user: UserInfo;
+  };
+}
+
+export interface SupabaseResponseData {
+  user: UserInfo;
+}
+
+export interface Profile {
+  id: string;
+  email: string;
+  created_at: string;
+  credits: number;
+}

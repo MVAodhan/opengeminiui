@@ -1,12 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/utils";
+import { supabaseClient as supabase } from "@/lib/supabase/client";
 import Link from "next/link";
 import React from "react";
 
 export default function SignUpScreen() {
-  const signupWithGithun = async () => {
+  const signinWithGithun = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "github",
     });
@@ -21,7 +21,6 @@ export default function SignUpScreen() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 bg-white p-8 sm:p-10 rounded-xl shadow-lg">
         <div>
-          {/* Placeholder for Logo */}
           <div className="mx-auto h-12 w-12  rounded-full mb-4">
             <Link href="/">
               <svg
@@ -43,7 +42,7 @@ export default function SignUpScreen() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          {/* <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <Link
               href="/sign-in"
@@ -51,12 +50,10 @@ export default function SignUpScreen() {
             >
               sign in to your existing account
             </Link>
-          </p>
+          </p> */}
         </div>
         <div className="mt-8 space-y-6">
-          <input type="hidden" name="remember" defaultValue="true" />
-          {/* Removed shadow-sm and rounded-md from this container */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <div>
               <label htmlFor="full-name" className="sr-only">
                 Full Name
@@ -140,12 +137,12 @@ export default function SignUpScreen() {
                 Or continue with
               </span>
             </div>
-          </div>
+          </div> */}
 
           <div className="flex w-full ">
             <div className="w-full">
               <Button
-                onClick={signupWithGithun}
+                onClick={signinWithGithun}
                 className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition duration-150 ease-in-out"
               >
                 {/* Placeholder for GitHub Icon */}

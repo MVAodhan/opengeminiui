@@ -1,7 +1,23 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
+import { supabaseClient as supabase } from "@/lib/supabase/client";
 
-export default function SignUpScreen() {
+export default function SignInScreen() {
+  const signinWithGithun = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+    });
+
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(data);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 bg-white p-8 sm:p-10 rounded-xl shadow-lg">
@@ -29,7 +45,7 @@ export default function SignUpScreen() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign In
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          {/* <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <Link
               href="/sign-up"
@@ -37,11 +53,11 @@ export default function SignUpScreen() {
             >
               create a account
             </Link>
-          </p>
+          </p> */}
         </div>
-        <form className="mt-8 space-y-6" action="#" method="POST">
-          <input type="hidden" name="remember" defaultValue="true" />
-          {/* Removed shadow-sm and rounded-md from this container */}
+        <div className="mt-8 space-y-6">
+          {/* 
+          
           <div className="space-y-4">
             <div>
               <label htmlFor="email-address" className="sr-only">
@@ -96,12 +112,12 @@ export default function SignUpScreen() {
                 Or sign in with
               </span>
             </div>
-          </div>
+          </div>  */}
 
           <div className="flex w-full ">
             <div className="w-full">
-              <a
-                href="#"
+              <Button
+                onClick={signinWithGithun}
                 className="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition duration-150 ease-in-out"
               >
                 {/* Placeholder for GitHub Icon */}
@@ -116,10 +132,10 @@ export default function SignUpScreen() {
                   </svg>
                 </div>
                 <span className="sr-only sm:not-sr-only">GitHub</span>
-              </a>
+              </Button>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
