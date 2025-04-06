@@ -11,9 +11,9 @@ const google = createGoogleGenerativeAI({
 export async function POST(req: Request) {
   const supabase = await createClient();
 
-  const { data: profiles } = await supabase.from("profiles").select("credits");
+  const { data: profile } = await supabase.from("profiles").select("*");
 
-  if (profiles![0].credits === 0) {
+  if (profile![0].credits === 0) {
     return Response.json(
       {
         error: {
@@ -25,7 +25,6 @@ export async function POST(req: Request) {
   }
 
   const { messages } = await req.json();
-
   const systemPrompt = returnPrompt();
 
   const result = streamText({
@@ -33,6 +32,13 @@ export async function POST(req: Request) {
     system: systemPrompt,
     messages,
   });
+  const newCredits = await supabase
+    .from("profiles")
+    .update({ credits: Number(profile![0].credits) - 1 })
+    .eq("id", profile![0].id)
+    .select();
+
+  console.log(newCredits);
 
   return result.toDataStreamResponse();
 }
