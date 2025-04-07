@@ -114,12 +114,12 @@ const Home = () => {
           development workflows.
         </p>
         <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-16 relative z-10">
-          <Link
+          {/* <Link
             href="/sign-up"
             className="bg-indigo-600 text-white px-8 py-3.5 rounded-lg text-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out shadow-lg hover:shadow-indigo-500/30 transform hover:-translate-y-0.5"
           >
             Sign Up
-          </Link>
+          </Link> */}
           <Link
             href="https://github.com/MVAodhan/opengeminiui"
             target="_blank"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // import { ClaudeChat } from "./my-components/chatui";
 import CodeBlock from "../my-components/code-block";
 import { useChat } from "@ai-sdk/react";
@@ -30,6 +30,7 @@ export default function Home() {
         }
       },
     });
+  // sendExtraMessageFields: true,
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -119,6 +120,7 @@ export default function Home() {
                 </div>
               ))}
               <div ref={messagesEndRef} />
+
               {customErr && (
                 <Alert variant="destructive" className="mb-2">
                   <AlertCircle className="h-4 w-4" />

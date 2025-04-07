@@ -1,4 +1,4 @@
-import { streamText } from "ai";
+import { appendResponseMessages, Message, streamText } from "ai";
 
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { returnPrompt } from "@/lib/utils";
@@ -24,21 +24,50 @@ export async function POST(req: Request) {
     );
   }
 
-  const { messages } = await req.json();
+  const { messages, id } = await req.json();
   const systemPrompt = returnPrompt();
 
+  async function saveChat({
+    id,
+    userID,
+    messages,
+  }: {
+    id: string;
+    userID: string;
+    messages: Message[];
+  }) {
+    await supabase
+      .from("chats")
+      .upsert([
+        { chat_id: id, messages: JSON.stringify(messages), user_id: userID },
+      ])
+      .eq("user_id", userID);
+  }
+
   const result = streamText({
-    model: google("gemini-2.0-pro-exp-02-05"),
+    model: google("gemini-2.0-flash-001"),
     system: systemPrompt,
     messages,
+    async onFinish({ response }) {
+      const { data: userID } = await supabase.from("profiles").select("id");
+      if (userID) {
+        await saveChat({
+          id: id,
+          userID: userID[0].id,
+          messages: appendResponseMessages({
+            messages,
+            responseMessages: response.messages,
+          }),
+        });
+      }
+    },
   });
-  const newCredits = await supabase
+
+  await supabase
     .from("profiles")
     .update({ credits: Number(profile![0].credits) - 1 })
     .eq("id", profile![0].id)
     .select();
-
-  console.log(newCredits);
 
   return result.toDataStreamResponse();
 }

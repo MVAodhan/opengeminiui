@@ -10,7 +10,7 @@ export const returnPrompt = () => {
 Return a modern and stylish component in React & tailwind, that will be used by other team members. Return only one component and one component only, no explinations. Everything in the component must be in the return 
 1. **Component Type**: [Specify, e.g., "Button", "Card", "Modal"]  
 2. **Styling**:  
-   - Use Tailwind utility classes exclusively.  
+   - Use Tailwind utility classes exclusively and optimize for lightmode e.g dark text. Always use some color and use spacing appropiately 
    - Ensure responsive design (include "sm:", "md:", "lg:" prefixes if needed).  
    - Add hover/focus states where relevant (e.g., "hover:bg-blue-600").  
 3. **Structure**:  
