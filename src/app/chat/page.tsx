@@ -20,6 +20,12 @@ export default function Home() {
   const [customErr, setCustomErr] = useState<string | null>(null);
   const [code, setCode] = useState<string>("");
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [chatIDs, setChatIDs] = useState<
+    | {
+        id: string;
+      }[]
+    | []
+  >([]);
 
   const { messages, handleInputChange, handleSubmit, status, input, error } =
     useChat({
@@ -70,6 +76,21 @@ export default function Home() {
     }
   };
 
+  const getChats = async (userID: string) => {
+    const { data: chats, error } = await supabase
+      .from("chats")
+      .select("chat_id")
+      .eq("user_id", userID);
+
+    let chatIDs: { id: string }[] = [];
+    if (!error) {
+      for (const chat of chats) {
+        chatIDs = [...chatIDs, { id: chat.chat_id }];
+      }
+    }
+    setChatIDs(chatIDs);
+  };
+
   useEffect(() => {
     getUserCall();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,11 +114,18 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
+  useEffect(() => {
+    if (!profile) return;
+    getChats(profile?.id);
+  }, [profile]);
+
+  console.log("chatIDs", chatIDs);
+
   return (
     <div className="h-screen w-screen overflow-hidden">
       {/* Chat Panel */}
       <SidebarProvider defaultOpen={false} className="w-screen h-screen ">
-        {profile && <AppSidebar credits={profile.credits} />}
+        {profile && <AppSidebar credits={profile.credits} chatIDs={chatIDs} />}
         <div className="w-screen h-full flex">
           <div className="w-1/2 h-full bg-gray-100 border-r border-gray-300 flex flex-col p-4">
             <SidebarTrigger />
