@@ -38,10 +38,12 @@ export async function POST(req: Request) {
   }) {
     await supabase
       .from("chats")
-      .upsert([
-        { chat_id: id, messages: JSON.stringify(messages), user_id: userID },
-      ])
-      .eq("user_id", userID);
+      .upsert({
+        chat_id: id,
+        messages: JSON.stringify(messages),
+        user_id: userID,
+      })
+      .eq("chat_id", id);
   }
 
   const result = streamText({
