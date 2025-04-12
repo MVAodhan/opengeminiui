@@ -7,14 +7,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavMain({
   items,
   credits,
 }: {
   items: {
-    title: string;
-    url: string;
+    id: string;
   }[];
   credits?: number;
 }) {
@@ -37,11 +37,13 @@ export function NavMain({
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                <span>{item.id}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            <Link key={item.id} href={`/chat/${item.id}`}>
+              <SidebarMenuItem>
+                <SidebarMenuButton tooltip={item.id}>
+                  <span>{item.id}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </Link>
           ))}
         </SidebarMenu>
       </SidebarGroupContent>
