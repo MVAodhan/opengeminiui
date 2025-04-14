@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project bootstrapped with [Supabase](https://supabase.com/) & [The Vercel AI SDK](https://sdk.vercel.ai/)
 
-## Getting Started
+Rename the .env.example file to .env and fill in your env varriables.
 
-First, run the development server:
+GOOGLE_GENERATIVE_AI_API_KEY='<your-aistudio-api>'
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The above can be generated from [Google AI Studio](https://aistudio.google.com/) \_Get Api Key > Create API Key\*
+
+NEXT_PUBLIC_SUPABASE_URL='<your-supabase-url>'
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY='<your-supabase-anon-key>'
+
+The above two will be generated after creating a Free Supabase Project
+
+NEXT\*PUBLIC_SUPABASE_URL Project Settings > Data API > URL
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY Project Settings > Data API > ANON | PUBLIC key
+
+Create two different Tables as visualised bellow. Database > Tables > New Table
+![Table Schema](<Screenshot 2025-04-13 at 11.12.59 PM.png>)
+
+To create a Foreign key, click the link next to the column name and link it to the users table auth schema, managed by supabase!
+
+![Supabase Foreign key](<Screenshot 2025-04-14 at 2.04.14 AM.png>)
+
+Create Row Level Security policies for each of the tables
+
+![alt text](<Screenshot 2025-04-14 at 11.35.23 PM.png>)
+For the Chats table, create a policy fgor all crud actions
+using ` (( SELECT auth.uid() AS uid) = user_id)`
+![alt text](<Screenshot 2025-04-14 at 11.41.46 PM.png>)
+
+And create a policy for select and update on the profiles table using the followin statement for each `(( SELECT auth.uid() AS uid) = id)`
+
+Create a database trigger that will create profile after a user signs up. Go to the SQL Editor and run this code block
+
+```
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, created_at, credits)
+  values (new.id, new.email, new.created_at, 0);
+  return new;
+end;
+$$ language plpgsql security definer;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+If you see `Success. No Rows Created` Run the next block
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+create or replace trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Finally, turn on on create a hithub OAuth App
+Authentication > Sign In / Up > Auth Providers > Github

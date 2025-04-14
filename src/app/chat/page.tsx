@@ -125,8 +125,10 @@ export default function Home() {
         {profile && <AppSidebar credits={profile.credits} chatids={chatIDs} />}
         <div className="w-screen h-full flex">
           <div className="w-1/2 h-full bg-gray-100 border-r border-gray-300 flex flex-col p-4">
-            <SidebarTrigger />
-
+            <div className="flex w-full border border-red-500">
+              <SidebarTrigger />
+              <h1>Hello</h1>
+            </div>
             <div className="overflow-y-auto mb-4  h-full">
               {messages.map((message) => (
                 <div
@@ -152,7 +154,6 @@ export default function Home() {
                   <AlertTitle>Error</AlertTitle>
                   <AlertDescription className="flex w-full justify-between items-center">
                     {customErr}
-
                     <Button variant="ghost">Reload</Button>
                   </AlertDescription>
                 </Alert>
