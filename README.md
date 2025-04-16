@@ -17,7 +17,7 @@ NEXT\*PUBLIC_SUPABASE_URL Project Settings > Data API > URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY Project Settings > Data API > ANON | PUBLIC key
 
 Create two different Tables as visualised bellow. Database > Tables > New Table
-![Table Schema](<Screenshot 2025-04-13 at 11.12.59 PM.png>)
+![alt text](<Screenshot 2025-04-17 at 1.45.48 AM.png>)
 
 To create a Foreign key, click the link next to the column name and link it to the users table auth schema, managed by supabase!
 

@@ -12,6 +12,7 @@ import { Message, useChat } from "@ai-sdk/react";
 import { AlertCircle } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { supabaseClient as supabase } from "@/lib/supabase/client";
+import { NameSubmitInput } from "@/app/my-components/name-submit";
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const [id, setID] = useState<string | null>(null);
@@ -21,9 +22,11 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const [chatIDs, setChatIDs] = useState<
     | {
         id: string;
+        name: string | null;
       }[]
     | []
   >([]);
+
   const [initialMessages, setInitialMessages] = useState<Message[] | null>();
 
   const { messages, handleInputChange, handleSubmit, status, input, error } =
@@ -50,7 +53,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const getInitialMessages = async () => {
     const { data: chats, error } = await supabase
       .from("chats")
-      .select("messages")
+      .select("*")
       .eq("chat_id", id);
 
     if (error) return;
@@ -89,6 +92,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   };
 
   useEffect(() => {
+    if (!id) return;
     getInitialMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -106,13 +110,13 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
   const getChats = async (userID: string) => {
     const { data: chats, error } = await supabase
       .from("chats")
-      .select("chat_id")
+      .select("*")
       .eq("user_id", userID);
 
-    let chatIDs: { id: string }[] = [];
+    let chatIDs: { id: string; name: string | null }[] = [];
     if (!error) {
       for (const chat of chats) {
-        chatIDs = [...chatIDs, { id: chat.chat_id }];
+        chatIDs = [...chatIDs, { id: chat.chat_id, name: chat.name }];
       }
     }
     setChatIDs(chatIDs);
@@ -169,7 +173,6 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         initialMessages[initialMessages.length - 1].content
       );
 
-      console.log("extract text");
       if (extracted !== null && extracted !== undefined) {
         setCode(extracted);
       }
@@ -185,39 +188,46 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         )}
         <div className="w-screen h-full flex">
           <div className="w-1/2 h-full bg-gray-100 border-r border-gray-300 flex flex-col p-4">
-            <SidebarTrigger />
-
-            <div className="overflow-y-auto mb-4  h-full">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`mb-3 p-3 rounded-lg max-w-4/5 ${
-                    message.role === "user"
-                      ? "bg-green-100"
-                      : "bg-gray-200 ml-auto"
-                  }`}
-                >
-                  {message.role !== "user" ? (
-                    <CodeBlock code={message.content} />
-                  ) : (
-                    `${message.content}`
-                  )}
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-
-              {customErr && (
-                <Alert variant="destructive" className="mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription className="flex w-full justify-between items-center">
-                    {customErr}
-
-                    <Button variant="ghost">Reload</Button>
-                  </AlertDescription>
-                </Alert>
-              )}
+            <div className="flex w-full justify-between pb-2">
+              <SidebarTrigger />
+              <NameSubmitInput id={id!} />
             </div>
+
+            {messages && (
+              <div className="overflow-y-auto mb-4  h-full">
+                {messages.map((message, i) => {
+                  return (
+                    <div
+                      key={`${message.id}-${i}`}
+                      className={`mb-3 p-3 rounded-lg max-w-4/5 ${
+                        message.role === "user"
+                          ? "bg-green-100"
+                          : "bg-gray-200 ml-auto"
+                      }`}
+                    >
+                      {message.role !== "user" ? (
+                        <CodeBlock code={message.content} />
+                      ) : (
+                        `${message.content}`
+                      )}
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+
+                {customErr && (
+                  <Alert variant="destructive" className="mb-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription className="flex w-full justify-between items-center">
+                      {customErr}
+
+                      <Button variant="ghost">Reload</Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
 
             <div className="flex mt-auto">
               <form onSubmit={handleSubmit} className="w-full">

@@ -15,6 +15,7 @@ export function NavMain({
 }: {
   items: {
     id: string;
+    name: string | null;
   }[];
   credits?: number;
 }) {
@@ -42,7 +43,11 @@ export function NavMain({
             <Link key={item.id} href={`/chat/${item.id}`}>
               <SidebarMenuItem>
                 <SidebarMenuButton tooltip={item.id}>
-                  <span>{item.id}</span>
+                  {item.name ? (
+                    <span>{item.name}</span>
+                  ) : (
+                    <span>{item.id}</span>
+                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </Link>

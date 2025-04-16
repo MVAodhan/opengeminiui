@@ -163,7 +163,7 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
   credits?: number;
-  chatids: { id: string }[] | [];
+  chatids: { id: string; name: string | null }[] | [];
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 

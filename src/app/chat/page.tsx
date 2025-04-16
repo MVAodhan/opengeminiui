@@ -22,6 +22,7 @@ export default function Home() {
   const [chatIDs, setChatIDs] = useState<
     | {
         id: string;
+        name: string | null;
       }[]
     | []
   >([]);
@@ -78,13 +79,13 @@ export default function Home() {
   const getChats = async (userID: string) => {
     const { data: chats, error } = await supabase
       .from("chats")
-      .select("chat_id")
+      .select("*")
       .eq("user_id", userID);
 
-    let chatIDs: { id: string }[] = [];
+    let chatIDs: { id: string; name: string | null }[] = [];
     if (!error) {
       for (const chat of chats) {
-        chatIDs = [...chatIDs, { id: chat.chat_id }];
+        chatIDs = [...chatIDs, { id: chat.chat_id, name: chat.name }];
       }
     }
     setChatIDs(chatIDs);
@@ -125,9 +126,8 @@ export default function Home() {
         {profile && <AppSidebar credits={profile.credits} chatids={chatIDs} />}
         <div className="w-screen h-full flex">
           <div className="w-1/2 h-full bg-gray-100 border-r border-gray-300 flex flex-col p-4">
-            <div className="flex w-full border border-red-500">
+            <div className="flex w-full justify-between pb-2">
               <SidebarTrigger />
-              <h1>Hello</h1>
             </div>
             <div className="overflow-y-auto mb-4  h-full">
               {messages.map((message) => (
