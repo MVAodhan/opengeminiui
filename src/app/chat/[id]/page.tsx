@@ -56,10 +56,15 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
       .select("*")
       .eq("chat_id", id);
 
-    if (error) return;
-
-    const parsedChats = JSON.parse(chats[0].messages);
-    setInitialMessages(parsedChats);
+    if (chats && chats.length === 0) {
+      console.log("error", error);
+      return;
+    }
+    if (chats && chats[0].messages) {
+      console.log("parsing chats");
+      const parsedChats = JSON.parse(chats[0].messages);
+      setInitialMessages(parsedChats);
+    }
   };
 
   function extractReturnJSX(componentCode: string) {

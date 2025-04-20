@@ -5,6 +5,8 @@ import { supabaseClient as supabase } from "@/lib/supabase/client";
 import { SupbaseUserResponse, UserInfo } from "@/lib/types";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { createChat } from "./tools/chat-store";
+import { redirect } from "next/navigation";
 
 const Home = () => {
   const [user, setUser] = useState<UserInfo | null>(null);
@@ -15,6 +17,12 @@ const Home = () => {
     if (error) {
       console.log(error);
     }
+  };
+
+  const generateAndRedirect = async () => {
+    const id = await createChat(); // create a new chat
+    console.log(id);
+    redirect(`/chat/${id}`);
   };
 
   const getUserCall = async () => {
@@ -61,12 +69,12 @@ const Home = () => {
           {!user && <Link href="/sign-in">Sign In</Link>}
           {user && (
             <div className="flex gap-3 items-center">
-              <Link
-                href="/chat"
+              <Button
+                onClick={generateAndRedirect}
                 className="text-gray-600 hover:text-indigo-600 transition duration-200 ease-in-out font-medium"
               >
                 Chat
-              </Link>
+              </Button>
               <Button variant="ghost" onClick={signOutUser}>
                 Sign Out
               </Button>

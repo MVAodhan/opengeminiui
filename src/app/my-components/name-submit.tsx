@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useRef, useState } from "react";
 import { supabaseClient as supabase } from "@/lib/supabase/client";
+import { DeleteButton } from "./delete-button";
 
 export const NameSubmitInput = ({ id }: { id: string }) => {
   const [pending, setPending] = useState<boolean>(false);
@@ -32,7 +33,16 @@ export const NameSubmitInput = ({ id }: { id: string }) => {
       .from("chats")
       .select("name")
       .eq("chat_id", id);
-    if (!error) {
+
+    if (error) {
+      console.log("name error", error);
+    }
+
+    if (chats && chats.length === 0) {
+      console.log("no chats");
+      return;
+    }
+    if (chats && chats[0].name) {
       setChatName(chats[0].name);
     }
   };
@@ -54,12 +64,7 @@ export const NameSubmitInput = ({ id }: { id: string }) => {
         aria-label="Enter your name"
         className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-800 placeholder-gray-400 transition duration-150 ease-in-out"
       />
-      <Button
-        variant="outline"
-        onClick={updateName}
-        aria-label="Submit name"
-        className="inline-flex items-center justify-center px-4 py-2 rounded-md shadow-sm  focus:outline-none"
-      >
+      <Button variant="outline" onClick={updateName} aria-label="Submit name">
         {!pending && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -91,6 +96,7 @@ export const NameSubmitInput = ({ id }: { id: string }) => {
           </div>
         )}
       </Button>
+      <DeleteButton id={id} />
     </div>
   );
 };
