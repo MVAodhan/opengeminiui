@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabaseClient as supabase } from "@/lib/supabase/client";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { useRef } from "react";
 import { z } from "zod";
 
@@ -47,17 +48,10 @@ export default function SignUpScreen() {
         email: signUpInfo.data.email,
         password: signUpInfo.data.password,
       });
-      if (!error) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: signUpInfo.data.email,
-          password: signUpInfo.data.password,
-        });
-
-        if (signInError) {
-          console.log(signInError);
-        }
-      } else {
+      if (error) {
         console.log(error);
+      } else {
+        redirect("/check-email");
       }
     }
   };
