@@ -2,10 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import React from "react";
+import React, { useRef } from "react";
 import { supabaseClient as supabase } from "@/lib/supabase/client";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function SignInScreen() {
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
   const signinWithGithun = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "github",
@@ -15,6 +19,17 @@ export default function SignInScreen() {
       console.log(error);
     } else {
       console.log(data);
+    }
+  };
+
+  const logInWithEmail = async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: emailRef.current!.value,
+      password: passwordRef.current!.value,
+    });
+
+    if (error) {
+      console.log(error);
     }
   };
 
@@ -45,7 +60,7 @@ export default function SignInScreen() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign In
           </h2>
-          {/* <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <Link
               href="/sign-up"
@@ -53,20 +68,19 @@ export default function SignInScreen() {
             >
               create a account
             </Link>
-          </p> */}
+          </p>
         </div>
         <div className="mt-8 space-y-6">
-          {/* 
-          
           <div className="space-y-4">
             <div>
-              <label htmlFor="email-address" className="sr-only">
+              <Label htmlFor="email-address" className="sr-only">
                 Email address
-              </label>
-              <input
+              </Label>
+              <Input
                 id="email-address"
                 name="email"
                 type="email"
+                ref={emailRef}
                 autoComplete="email"
                 required
                 // Added rounded-md, removed rounded-none
@@ -75,13 +89,14 @@ export default function SignInScreen() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <Label htmlFor="password" className="sr-only">
                 Password
-              </label>
-              <input
+              </Label>
+              <Input
                 id="password"
                 name="password"
                 type="password"
+                ref={passwordRef}
                 autoComplete="new-password"
                 required
                 // Added rounded-md, removed rounded-none
@@ -92,12 +107,12 @@ export default function SignInScreen() {
           </div>
 
           <div>
-            <button
-              type="submit"
+            <Button
+              onClick={logInWithEmail}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
             >
               Sign In
-            </button>
+            </Button>
           </div>
 
           <div className="relative my-6">
@@ -112,7 +127,7 @@ export default function SignInScreen() {
                 Or sign in with
               </span>
             </div>
-          </div>  */}
+          </div>
 
           <div className="flex w-full ">
             <div className="w-full">

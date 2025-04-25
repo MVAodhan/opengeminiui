@@ -1,22 +1,67 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabaseClient as supabase } from "@/lib/supabase/client";
 import Link from "next/link";
-import React from "react";
+import { useRef } from "react";
+import { z } from "zod";
 
 export default function SignUpScreen() {
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement | null>(null);
   const signinWithGithun = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "github",
     });
 
     if (error) {
       console.log(error);
-    } else {
-      console.log(data);
     }
   };
+
+  const signUpEmail = async () => {
+    const signUpSchema = z
+      .object({
+        name: z.string(),
+        email: z.string().email(),
+        password: z.string(),
+        confirm: z.string(),
+      })
+      .refine((data) => data.password === data.confirm, {
+        message: "Passwords don't match",
+        path: ["confirm"], // path of error
+      });
+
+    const signUpInfo = signUpSchema.safeParse({
+      name: nameRef.current?.value,
+      email: emailRef.current?.value,
+      password: passwordRef.current?.value,
+      confirm: confirmPasswordRef.current?.value,
+    });
+    if (signUpInfo.success === true) {
+      const { error } = await supabase.auth.signUp({
+        email: signUpInfo.data.email,
+        password: signUpInfo.data.password,
+      });
+      if (!error) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: signUpInfo.data.email,
+          password: signUpInfo.data.password,
+        });
+
+        if (signInError) {
+          console.log(signInError);
+        }
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 bg-white p-8 sm:p-10 rounded-xl shadow-lg">
@@ -42,7 +87,7 @@ export default function SignUpScreen() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
-          {/* <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
             <Link
               href="/sign-in"
@@ -50,48 +95,50 @@ export default function SignUpScreen() {
             >
               sign in to your existing account
             </Link>
-          </p> */}
+          </p>
         </div>
         <div className="mt-8 space-y-6">
-          {/* <div className="space-y-4">
+          <div className="space-y-4">
             <div>
-              <label htmlFor="full-name" className="sr-only">
+              <Label htmlFor="full-name" className="sr-only">
                 Full Name
-              </label>
-              <input
+              </Label>
+              <Input
                 id="full-name"
                 name="full-name"
                 type="text"
+                ref={nameRef}
                 autoComplete="name"
                 required
-                // Added rounded-md, removed rounded-t-md/rounded-none
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm shadow-sm"
-                placeholder="Full Name"
+                placeholder="Name"
               />
             </div>
             <div>
-              <label htmlFor="email-address" className="sr-only">
+              <Label htmlFor="email-address" className="sr-only">
                 Email address
-              </label>
-              <input
+              </Label>
+              <Input
                 id="email-address"
                 name="email"
                 type="email"
+                ref={emailRef}
                 autoComplete="email"
                 required
                 // Added rounded-md, removed rounded-none
                 className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm shadow-sm"
-                placeholder="Email address"
+                placeholder="Email"
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <Label htmlFor="password" className="sr-only">
                 Password
-              </label>
-              <input
+              </Label>
+              <Input
                 id="password"
                 name="password"
                 type="password"
+                ref={passwordRef}
                 autoComplete="new-password"
                 required
                 // Added rounded-md, removed rounded-none
@@ -100,13 +147,14 @@ export default function SignUpScreen() {
               />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="sr-only">
+              <Label htmlFor="confirm-password" className="sr-only">
                 Confirm Password
-              </label>
-              <input
+              </Label>
+              <Input
                 id="confirm-password"
                 name="confirm-password"
                 type="password"
+                ref={confirmPasswordRef}
                 autoComplete="new-password"
                 required
                 // Added rounded-md, removed rounded-b-md/rounded-none
@@ -117,12 +165,12 @@ export default function SignUpScreen() {
           </div>
 
           <div>
-            <button
-              type="submit"
+            <Button
+              onClick={signUpEmail}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
             >
               Sign up
-            </button>
+            </Button>
           </div>
 
           <div className="relative my-6">
@@ -137,7 +185,7 @@ export default function SignUpScreen() {
                 Or continue with
               </span>
             </div>
-          </div> */}
+          </div>
 
           <div className="flex w-full ">
             <div className="w-full">
